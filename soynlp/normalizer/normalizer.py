@@ -3,7 +3,7 @@ import unicodedata
 from typing import Callable, List, Union
 
 
-class Normalizer:
+class BaseNormalizer:
     def __call__(self, s: str) -> str:
         return self.normalize(s)
 
@@ -11,7 +11,7 @@ class Normalizer:
         raise NotImplementedError("Implement `normalize` function")
 
 
-class PassCharacterNormalizer(Normalizer):
+class PassCharacterNormalizer(BaseNormalizer):
     """
     Args:
         alphabet (bool)
@@ -65,7 +65,7 @@ class PassCharacterNormalizer(Normalizer):
         return self.pattern.sub(" ", s).strip()
 
 
-class HangleEmojiNormalizer(Normalizer):
+class HangleEmojiNormalizer(BaseNormalizer):
     """
     Example:
         >>> s = "어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하"
@@ -104,7 +104,7 @@ class HangleEmojiNormalizer(Normalizer):
         return ''.join(s_)
 
 
-class RepeatCharacterNormalizer(Normalizer):
+class RepeatCharacterNormalizer(BaseNormalizer):
     """
     Args:
         max_repeat (int)
@@ -123,7 +123,7 @@ class RepeatCharacterNormalizer(Normalizer):
         return self.pattern.sub(self.replace_str, s)
 
 
-class RemoveLongspaceNormalizer(Normalizer):
+class RemoveLongspaceNormalizer(BaseNormalizer):
     """
     Example:
         >>> RemoveLongspaceNormalizer()("ab     cd    d  f ")
@@ -136,7 +136,7 @@ class RemoveLongspaceNormalizer(Normalizer):
         return self.pattern.sub("  ", s)
 
 
-class PaddingSpacetoWordsNormalizer(Normalizer):
+class PaddingSpacetoWordsNormalizer(BaseNormalizer):
     """
     Example:
         >>> PaddingSpacetoWordsNormalizer()("(주)일이삼 [[공지]]제목 이것은예시다!!")
@@ -160,29 +160,29 @@ class PaddingSpacetoWordsNormalizer(Normalizer):
         return ''.join(s_)
 
 
-class TextNormalizer(Normalizer):
+class Normalizer(BaseNormalizer):
     """
     Example:
-        >>> normalizer = TextNormalizer.build_normalizer()
+        >>> normalizer = Normalizer.build_normalizer()
         >>> normalizer("어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하")
         $ '어머나 ㅋㅋㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅜㅜ 하하'
 
-        >>> normalizer = TextNormalizer.build_normalizer(remove_repeatchar=3)
+        >>> normalizer = Normalizer.build_normalizer(remove_repeatchar=3)
         >>> normalizer("어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하")
         $ '어머나 ㅋㅋㅋㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅜㅜㅜ 하하'
 
         >>> normalizer("(주)일이삼 [[공지]]제목 이것은예시다!!")
         $ '(주)일이삼 [[공지]]제목 이것은예시다!!'
 
-        >>> normalizer = TextNormalizer.build_normalizer(padding_space=True)
+        >>> normalizer = Normalizer.build_normalizer(padding_space=True)
         >>> normalizer("(주)일이삼 [[공지]]제목 이것은예시다!!")
         $ '( 주 ) 일이삼  [[ 공지 ]] 제목  이것은예시다 !!'
 
-        >>> normalizer = TextNormalizer.build_normalizer(padding_space=True, symbol=False)
+        >>> normalizer = Normalizer.build_normalizer(padding_space=True, symbol=False)
         >>> normalizer("(주)일이삼 [[공지]]제목 이것은예시다!!")
         $ ' 주  일이삼  공지  제목  이것은예시다 '
 
-        >>> normalizer = TextNormalizer.build_normalizer(padding_space=False, symbol=False, custom="/:@.")
+        >>> normalizer = Normalizer.build_normalizer(padding_space=False, symbol=False, custom="/:@.")
         >>> normalizer("soynlp의 주소는 https://github.com/lovit/soynlp/ 입니다.")
         $ 'soynlp의 주소는 https://github.com/lovit/soynlp/ 입니다.'
     """
@@ -252,7 +252,7 @@ class TextNormalizer(Normalizer):
             )
         if not modules:
             raise ValueError("Empty components. Check normalizer builder arguments")
-        return TextNormalizer(modules)
+        return Normalizer(modules)
 
 
-text_normalizer = TextNormalizer.build_normalizer()  # default normalizer
+normalizer = Normalizer.build_normalizer()  # default normalizer

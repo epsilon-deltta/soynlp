@@ -4,8 +4,8 @@ from soynlp.normalizer.normalizer import (
     RepeatCharacterNormalizer,
     RemoveLongspaceNormalizer,
     PaddingSpacetoWordsNormalizer,
-    TextNormalizer,
-    text_normalizer
+    Normalizer,
+    normalizer
 )
 
 
@@ -69,13 +69,13 @@ def test_padding_space_to_words():
 
 
 def test_normalizer_builder():
-    normalizer = TextNormalizer.build_normalizer()
+    normalizer = Normalizer.build_normalizer()
     assert (
         normalizer("어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하")
         == "어머나 ㅋㅋㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅜㅜ 하하"
     )
 
-    normalizer = TextNormalizer.build_normalizer(remove_repeatchar=3)
+    normalizer = Normalizer.build_normalizer(remove_repeatchar=3)
     assert (
         normalizer("어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하")
         == "어머나 ㅋㅋㅋㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅜㅜㅜ 하하"
@@ -83,13 +83,13 @@ def test_normalizer_builder():
 
     assert normalizer("(주)일이삼 [[공지]]제목 이것은예시다!!") == "(주)일이삼 [[공지]]제목 이것은예시다!!"
 
-    normalizer = TextNormalizer.build_normalizer(padding_space=True)
+    normalizer = Normalizer.build_normalizer(padding_space=True)
     assert normalizer("(주)일이삼 [[공지]]제목 이것은예시다!!") == "( 주 ) 일이삼  [[ 공지 ]] 제목  이것은예시다 !!"
 
-    normalizer = TextNormalizer.build_normalizer(padding_space=True, symbol=False)
+    normalizer = Normalizer.build_normalizer(padding_space=True, symbol=False)
     assert normalizer("(주)일이삼 [[공지]]제목 이것은예시다!!") == " 주  일이삼  공지  제목  이것은예시다 "
 
-    normalizer = TextNormalizer.build_normalizer(
+    normalizer = Normalizer.build_normalizer(
         padding_space=False, symbol=False, custom="/:@."
     )
     assert (
@@ -100,6 +100,6 @@ def test_normalizer_builder():
 
 def test_default_text_normalizer():
     assert (
-        text_normalizer("어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하")
+        normalizer("어머나 ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅋㅋㅋ쿠ㅜㅜㅜㅜㅜ 하하")
         == "어머나 ㅋㅋㅜㅜ이런게 있으면 어떻게 떼어내냐 ㅋㅋㅜㅜ 하하"
     )
